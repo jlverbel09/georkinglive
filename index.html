@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JORGE VD | Portafolio Visual</title>
+    <style>
+        :root {
+            --sidebar-width: 300px;
+            --bg-color: #1a1a1a; /* Fondo oscuro para que resalten las fotos */
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            display: flex; /* Para separar perfil de galería */
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* --- SECCIÓN DE PERFIL (LATERAL) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid #333;
+            z-index: 10;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #444;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 3px solid #555;
+        }
+
+        .sidebar h1 { 
+            margin: 0; 
+            font-size: 1.8rem; 
+            color: #00a2ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tagline {
+            color: #00a2ff;
+            font-size: 0.85rem;
+            margin: 15px 0 30px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-left: 3px solid #00a2ff;
+            padding-left: 10px;
+            line-height: 1.4;
+        }
+        
+        .sidebar p { color: #aaa; line-height: 1.6; }
+        .info-label { font-weight: bold; color: #fff; display: block; margin-top: 15px; }
+
+        /* --- SECCIÓN DE GALERÍA (MOSAICO) --- */
+        .main-content {
+            margin-left: var(--sidebar-width); /* Deja espacio para el sidebar */
+            width: calc(100% - var(--sidebar-width));
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .masonry {
+            column-count: 4; /* 4 columnas para ocupar toda la pantalla */
+            column-gap: 10px;
+        }
+
+        .item {
+            display: inline-block;
+            margin-bottom: 10px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            transition: opacity 0.3s;
+            cursor: pointer;
+        }
+
+        .item img {
+            width: 100%;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .item:hover img {
+            transform: scale(1.05);
+            filter: brightness(0.7);
+        }
+
+        /* --- MODAL CARRUSEL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 0 50px rgb(0 142 255 / 30%);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-size: 40px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.3s;
+            z-index: 1001;
+        }
+
+        .modal-close:hover {
+            color: #00a2ff;
+        }
+
+        .modal-prev, .modal-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            color: #fff;
+            cursor: pointer;
+            padding: 20px;
+            transition: color 0.3s;
+            user-select: none;
+            z-index: 1001;
+        }
+
+        .modal-prev:hover, .modal-next:hover {
+            color: #00a2ff;
+        }
+
+        .modal-prev {
+            left: 30px;
+        }
+
+        .modal-next {
+            right: 30px;
+        }
+
+        .modal-counter {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1001;
+        }
+
+        /* Responsive para tablets y móviles */
+        @media (max-width: 1024px) {
+            .masonry { column-count: 3; }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #333;
+                text-align: center;
+                align-items: center;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .masonry { column-count: 2; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <img src="./fotos/principal.png" alt="Foto de Perfil" class="profile-img">
+        <h1>JORGE VD</h1>
+        <div class="tagline">
+            Desarrollador<br>Apasionado por la Tecnología
+        </div>
+        <p>Transformador de ideas en realidad digital.</p>
+        
+        <span class="info-label">Edad:</span>
+        <span id="edad">28 años</span>
+
+        <span class="info-label">Nacimiento:</span>
+        <span>09 de Septiembre, 1997</span>
+
+        <span class="info-label">Sobre mí:</span>
+        <p>Desarrollador fullstack con pasión por crear experiencias visuales impactantes. Cada línea de código cuenta una historia.</p>
+    </aside>
+
+    <main class="main-content">
+        <div class="masonry" id="galeria"></div>
+    </main>
+
+    <!-- MODAL CARRUSEL -->
+    <div id="modalCarrusel" class="modal">
+        <div class="modal-close">&times;</div>
+        <div class="modal-content">
+            <span class="modal-prev">&lt;</span>
+            <img id="modalImg" class="modal-img" src="" alt="Foto">
+            <span class="modal-next">&gt;</span>
+        </div>
+        <div class="modal-counter">
+            <span id="fotoActual">1</span> / <span id="totalFotos">0</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        let fotosArray = [];
+        let fotoActualIndex = 0;
+
+        $(document).ready(function() {
+            // Cargar fotos dinámicamente
+            $.getJSON('get-photos.php', function(fotos) {
+                fotosArray = fotos;
+                let galeriaHtml = '';
+                
+                fotos.forEach((foto, index) => {
+                    galeriaHtml += `
+                        <div class="item" data-index="${index}">
+                            <img src="${foto}" alt="Foto ${index + 1}">
+                        </div>
+                    `;
+                });
+                
+                $('#galeria').html(galeriaHtml);
+                $('#totalFotos').text(fotos.length);
+
+                // Evento click en las fotos para abrir el modal
+                $('.item').on('click', function() {
+                    fotoActualIndex = $(this).data('index');
+                    abrirModal();
+                });
+            }).fail(function() {
+                console.error('Error cargando las fotos');
+                $('#galeria').html('<p style="color: red;">Error al cargar las fotos</p>');
+            });
+
+            // Cerrar modal
+            $('.modal-close').on('click', cerrarModal);
+
+            // Click fuera del modal para cerrar
+            $('#modalCarrusel').on('click', function(e) {
+                if (e.target === this) {
+                    cerrarModal();
+                }
+            });
+
+            // Navegación del carrusel
+            $('.modal-prev').on('click', function(e) {
+                e.stopPropagation();
+                fotoActualIndex = (fotoActualIndex - 1 + fotosArray.length) % fotosArray.length;
+                mostrarFoto();
+            });
+
+            $('.modal-next').on('click', function(e) {
+                e.stopPropagation();
+                fotoActualIndex = (fotoActualIndex + 1) % fotosArray.length;
+                mostrarFoto();
+            });
+
+            // Navegación con teclas de flecha
+            $(document).on('keydown', function(e) {
+                if ($('#modalCarrusel').hasClass('active')) {
+                    if (e.key === 'ArrowLeft') {
+                        fotoActualIndex = (fotoActualIndex - 1 + fotosArray.length) % fotosArray.length;
+                        mostrarFoto();
+                    } else if (e.key === 'ArrowRight') {
+                        fotoActualIndex = (fotoActualIndex + 1) % fotosArray.length;
+                        mostrarFoto();
+                    } else if (e.key === 'Escape') {
+                        cerrarModal();
+                    }
+                }
+            });
+
+            // Calcular edad
+            function calcularEdad() {
+                const fechaNacimiento = new Date('1997-09-09');
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+                const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+                
+                if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+                    edad--;
+                }
+                
+                return edad;
+            }
+            
+            $('#edad').text(calcularEdad() + ' años');
+        });
+
+        function abrirModal() {
+            mostrarFoto();
+            $('#modalCarrusel').addClass('active');
+        }
+
+        function cerrarModal() {
+            $('#modalCarrusel').removeClass('active');
+        }
+
+        function mostrarFoto() {
+            $('#modalImg').attr('src', fotosArray[fotoActualIndex]);
+            $('#fotoActual').text(fotoActualIndex + 1);
+        }
+    </script>
+
+</body>
+</html>

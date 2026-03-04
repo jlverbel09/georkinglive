@@ -2,6 +2,13 @@
 header('Content-Type: application/json');
 
 $uploadDir = __DIR__ . '/fotos/';
+
+// si se proporciona usuario, crear subcarpeta
+$username = isset($_POST['username']) ? preg_replace('/[^a-zA-Z0-9_-]/','',$_POST['username']) : '';
+if ($username) {
+    $uploadDir .= $username . '/';
+}
+
 if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
@@ -46,6 +53,27 @@ if (isset($_FILES['fotos'])) {
     if ($uploaded) {
         $response['success'] = true;
         $response['message'] = 'Subidas: ' . implode(', ', $uploaded);
+
+        // si es para un usuario, actualizar su registro
+        if ($username) {
+            $jsonFile = __DIR__ . '/registro.json';
+            if (file_exists($jsonFile)) {
+                $content = file_get_contents($jsonFile);
+                $all = json_decode($content, true) ?: [];
+                foreach ($all as &$rec) {
+                    if (isset($rec['username']) && $rec['username'] === $username) {
+                        if (!isset($rec['gallery']) || !is_array($rec['gallery'])) {
+                            $rec['gallery'] = [];
+                        }
+                        foreach ($uploaded as $f) {
+                            $rec['gallery'][] = $username ? ($username . '/' . $f) : $f;
+                        }
+                        break;
+                    }
+                }
+                file_put_contents($jsonFile, json_encode($all, JSON_PRETTY_PRINT));
+            }
+        }
     }
     if ($errors) {
         $response['message'] .= ($response['message'] ? ' | ' : '') . 'Errores: ' . implode('; ', $errors);

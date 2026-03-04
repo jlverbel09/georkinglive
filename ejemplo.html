@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiHorizonteViajero | Mis Recuerdos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
+        :root {
+            --horizon-blue: #2c5282;
+            --sand: #f7fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--sand);
+            color: #2d3748;
+        }
+
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .travel-card {
+            transition: transform 0.3s ease;
+        }
+
+        .travel-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .custom-marker {
+            background-color: var(--horizon-blue);
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 py-8 px-6 text-center">
+        <h1 class="text-4xl md:text-5xl text-blue-900 mb-2">MiHorizonteViajero</h1>
+        <p class="text-gray-500 italic">"Donde el mapa se encuentra con el corazón."</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6">
+        
+        <!-- Sección Mapa -->
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Explora mis destinos</h2>
+                <span class="text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full uppercase font-semibold">Haz clic en los puntos</span>
+            </div>
+            <div id="map"></div>
+        </section>
+
+        <!-- Sección Detalle del Recuerdo (Dinámica) -->
+        <section id="memory-display" class="grid md:grid-cols-2 gap-8 items-center bg-white p-8 rounded-2xl shadow-sm hidden">
+            <div class="rounded-xl overflow-hidden shadow-lg h-80 bg-gray-100">
+                <img id="memory-img" src="" alt="Foto del viaje" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <div class="flex gap-2 mb-3">
+                    <span id="memory-country" class="text-xs font-bold tracking-widest uppercase text-blue-600"></span>
+                    <span class="text-gray-300">•</span>
+                    <span id="memory-city" class="text-xs font-bold tracking-widest uppercase text-gray-500"></span>
+                </div>
+                <h2 id="memory-title" class="text-3xl mb-4 text-gray-900"></h2>
+                <p id="memory-text" class="text-gray-600 leading-relaxed text-lg mb-6"></p>
+                <div class="flex items-center text-sm text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span id="memory-date"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Placeholder Inicial -->
+        <div id="placeholder" class="text-center py-20 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl">
+            <p class="text-gray-400">Selecciona un marcador en el mapa para revivir el recuerdo</p>
+        </div>
+
+    </main>
+
+    <footer class="mt-20 py-10 border-t border-gray-200 text-center text-gray-400 text-sm">
+        &copy; 2024 MiHorizonteViajero — Creado con ❤️ para mis recuerdos.
+    </footer>
+
+    <script>
+        // Datos de ejemplo para tus viajes
+        const viajes = [
+            {
+                id: 1,
+                coords: [40.4168, -3.7038],
+                ciudad: "Madrid",
+                pais: "España",
+                titulo: "El corazón de la península",
+                texto: "Pasear por el Retiro un domingo por la mañana me recordó por qué amo viajar. El sol filtrándose entre los árboles y el ambiente relajado de la ciudad fueron el inicio perfecto de mi horizonte.",
+                fecha: "Junio 2023",
+                img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 2,
+                coords: [48.8566, 2.3522],
+                ciudad: "París",
+                pais: "Francia",
+                titulo: "Luces sobre el Sena",
+                texto: "París no es solo la Torre Eiffel. Es perderse en las calles de Montmartre, comprar una baguette caliente y ver cómo se encienden las luces del río al atardecer.",
+                fecha: "Septiembre 2023",
+                img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 3,
+                coords: [35.6762, 139.6503],
+                ciudad: "Tokio",
+                pais: "Japón",
+                titulo: "El futuro es hoy",
+                texto: "El contraste entre los templos silenciosos de Asakusa y el caos ordenado de Shibuya es algo que solo se puede entender estando allí. Una explosión de sabores y luces.",
+                fecha: "Marzo 2024",
+                img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80"
+            }
+        ];
+
+        // Inicializar el mapa centrado en el mundo
+        const map = L.map('map', {
+            scrollWheelZoom: false
+        }).setView([20, 0], 2);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Función para mostrar el recuerdo
+        function showMemory(viaje) {
+            document.getElementById('placeholder').classList.add('hidden');
+            const display = document.getElementById('memory-display');
+            display.classList.remove('hidden');
+            
+            document.getElementById('memory-img').src = viaje.img;
+            document.getElementById('memory-title').innerText = viaje.titulo;
+            document.getElementById('memory-country').innerText = viaje.pais;
+            document.getElementById('memory-city').innerText = viaje.ciudad;
+            document.getElementById('memory-text').innerText = viaje.texto;
+            document.getElementById('memory-date').innerText = viaje.fecha;
+
+            // Scroll suave hacia la sección
+            display.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Añadir marcadores al mapa
+        viajes.forEach(viaje => {
+            const marker = L.circleMarker(viaje.coords, {
+                radius: 8,
+                fillColor: "#2c5282",
+                color: "#fff",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+
+            marker.on('click', () => {
+                showMemory(viaje);
+            });
+
+            // Tooltip rápido al pasar el ratón
+            marker.bindTooltip(`${viaje.ciudad}, ${viaje.pais}`);
+        });
+    </script>
+</body>
+</html>

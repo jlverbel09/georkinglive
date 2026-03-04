@@ -1,0 +1,16 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# if request is for an existing file or directory, serve it directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# otherwise treat the first path segment as username
+RewriteRule ^([A-Za-z0-9_-]+)/?$ profile.php?user=$1 [L,QSA]
+# bloquear hotlinking de imágenes (solo permitir referer interno o vacío)
+RewriteCond %{REQUEST_URI} \.(jpe?g|png|gif)$ [NC]
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?mihorizonteviajero [NC]
+RewriteRule \.(jpe?g|png|gif)$ - [F,NC]
+

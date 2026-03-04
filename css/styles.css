@@ -16,7 +16,8 @@ img {
 }
 
 /* evitar interacción sólo sobre las miniaturas del carrusel/galería */
-.item img, #modalImg {
+.item img,
+#modalImg {
     pointer-events: none;
 }
 
@@ -277,9 +278,10 @@ body {
     user-select: none;
     z-index: 1001;
 }
-.modal-next{
+
+.modal-next {
     width: 45%;
-    right: 0;
+    right: 0 !important;
     position: fixed;
     height: 100%;
     max-height: 100%;
@@ -290,9 +292,10 @@ body {
     content: "";
     background-color: transparent;
 }
-.modal-prev{
+
+.modal-prev {
     width: 45%;
-    left: 0;
+    left: 0 !important;
     position: fixed;
     height: 100%;
     max-height: 100%;
@@ -302,11 +305,14 @@ body {
     align-items: center;
     content: "";
     background-color: transparent;
+    top: 21rem;
+    height: 46%;
 }
-    
+
+
 .modal-prev:hover,
 .modal-next:hover {
-    color: #00a2ff;
+    color: transparent;
 }
 
 .modal-prev {

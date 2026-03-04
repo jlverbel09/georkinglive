@@ -5,6 +5,76 @@
     --text-color: #ffffff;
 }
 
+/* PANTALLA DE CARGA */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-container {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 50px 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 162, 255, 0.2);
+    border: 1px solid rgba(0, 162, 255, 0.3);
+    max-width: 400px;
+}
+
+.loading-container h2 {
+    margin: 0 0 30px 0;
+    font-size: 1.5rem;
+    color: #00a2ff;
+    font-weight: 600;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00a2ff, #00d9ff);
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 162, 255, 0.6);
+}
+
+.loading-stats {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.percentage {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00a2ff;
+    text-shadow: 0 0 10px rgba(0, 162, 255, 0.5);
+}
+
+/* PANTALLA DE CARGA - FIN */
+
 /* medidas de protección de imágenes (galería) */
 img {
     -webkit-user-drag: none;
@@ -289,8 +359,9 @@ body {
     justify-content: right;
     display: flex;
     align-items: center;
-    content: "";
     background-color: transparent;
+    top: 21rem;
+    height: 46%;
 }
 
 .modal-prev {
@@ -303,7 +374,6 @@ body {
     justify-content: left;
     display: flex;
     align-items: center;
-    content: "";
     background-color: transparent;
     top: 21rem;
     height: 46%;
@@ -312,7 +382,8 @@ body {
 
 .modal-prev:hover,
 .modal-next:hover {
-    color: transparent;
+    color: white;
+    background-color: transparent;
 }
 
 .modal-prev {
@@ -321,6 +392,16 @@ body {
 
 .modal-next {
     right: 30px;
+}
+
+@media (max-width:700px) {
+
+    .modal-prev,
+    .modal-next {
+        top: 37rem;
+        width: 38%;
+        height: 17%;
+    }
 }
 
 .modal-counter {

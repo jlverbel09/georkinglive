@@ -26,11 +26,42 @@ if (!$userData) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($userData['nombre']); ?> | Mi Mundo Viajero</title>
+    <title><?php echo htmlspecialchars($userData['nombre']); ?> | Mi Horizonte Viajero</title>
     <link rel="stylesheet" href="./css/styles.css">
+
+    <link rel="icon" href="https://georkingweb.com/live/logo.png" type="image/x-icon">
+    <meta name="theme-color" content="#000000">
+    <!--begin::Primary Meta Tags-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="title" content="Mi Horizonte Viajero">
+    <meta name="author" content="GeorkingWeb">
+    <meta name="description"
+        content="Explorando rincones, probando sabores y viviendo historias. 🗺️📸">
+
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta property="og:title" content="Mi Horizonte Viajero">
+    <meta property="og:description" content="Explorando rincones, probando sabores y viviendo historias. 🗺️📸">
+    <meta property="og:image" content="https://georkingweb.com/live/logo.png">
+    <meta property="og:url" content="https://https://georkingweb.com/live/">
+    <meta property="og:type" content="website">
+
 </head>
 
 <body>
+    <!-- PANTALLA DE CARGA -->
+    <div id="loadingScreen" class="loading-screen active">
+        <div class="loading-container">
+            <h2>Cargando perfil...</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="loading-stats">
+                <span id="photosLoaded">0</span> / <span id="totalPhotos">0</span> fotos
+            </div>
+            <div class="percentage" id="percentageDisplay">0%</div>
+        </div>
+    </div>
+
     <aside class="sidebar">
         <img draggable="false" ondragstart="return false;" oncontextmenu="return false;" src="<?php echo $userData['profilePhoto'] ? './profiles/' . $userData['profilePhoto'] : './usuario.png'; ?>" alt="Foto de Perfil" class="profile-img">
         <h1><?php echo htmlspecialchars($userData['nombre']); ?></h1>
@@ -71,14 +102,14 @@ if (!$userData) {
             <button id="updateYoutubeBtn" style="margin-bottom:10px;width:100%">Actualizar URL</button>
 
             <button id="editProfileBtn" class="btn-open-form" style="margin-top:10px;">Editar perfil</button>
-            
+
             <button id="lockProfileBtn" style="margin-top:10px;width:100%;background-color:#ff6b6b;color:white;border:none;padding:8px;border-radius:4px;cursor:pointer;">Cerrar sesión</button>
         </div>
 
         <div id="unlockMessage" style="text-align:center;color:#999;margin-top:20px;display:block;">
-             <p style="text-align: left;"><?php echo nl2br(htmlspecialchars($userData['sobreMi'])); ?></p>
-             
-             <p style="font-size:12px;">Haz <strong>doble click</strong> en la foto de perfil para acceder</p>
+            <p style="text-align: left;"><?php echo nl2br(htmlspecialchars($userData['sobreMi'])); ?></p>
+
+            <p style="font-size:12px;">Haz <strong>doble click</strong> en la foto de perfil para acceder</p>
         </div>
 
         <button id="musicToggle" title="Silenciar/activar música">🔇</button>

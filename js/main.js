@@ -43,6 +43,35 @@ function onYouTubeIframeAPIReady() {
 }
 
 $(document).ready(function() {
+    // Inicializar pantalla de carga
+    var loadingScreen = $('#loadingScreen');
+    var progressFill = $('#progressFill');
+    var photosLoadedSpan = $('#photosLoaded');
+    var totalPhotosSpan = $('#totalPhotos');
+    var percentageDisplay = $('#percentageDisplay');
+    var totalPhotos = 0;
+    var photosLoaded = 0;
+
+    function updateLoadingProgress() {
+        if (totalPhotos === 0) {
+            photosLoadedSpan.text('0');
+            progressFill.css('width', '0%');
+            percentageDisplay.text('0%');
+        } else {
+            var percentage = Math.round((photosLoaded / totalPhotos) * 100);
+            photosLoadedSpan.text(photosLoaded);
+            progressFill.css('width', percentage + '%');
+            percentageDisplay.text(percentage + '%');
+        }
+    }
+
+    function hideLoadingScreen() {
+        // Esperar a que las imágenes se carguen en el DOM
+        setTimeout(function() {
+            loadingScreen.addClass('hidden');
+        }, 500);
+    }
+
     // bloquear interacciones básicas con imágenes
     $(document).on('contextmenu', 'img', function(){ return false; });
     $(document).on('dragstart', 'img', function(){ return false; });
@@ -64,18 +93,42 @@ $(document).ready(function() {
     }
     $.getJSON('get-photos.php' + (userQuery ? '?' + userQuery : ''), function(fotos) {
         fotosArray = fotos;
+        totalPhotos = fotos.length;
+        totalPhotosSpan.text(totalPhotos);
+
+        // Actualizar progreso inicial
+        updateLoadingProgress();
+
         let galeriaHtml = '';
 
         fotos.forEach((foto, index) => {
             galeriaHtml += `
                 <div class="item" data-index="${index}">
-                    <img draggable="false" ondragstart="return false;" oncontextmenu="return false;" onmousedown="return false;" src="${foto}" alt="Foto ${index + 1}">
+                    <img draggable="false" ondragstart="return false;" oncontextmenu="return false;" onmousedown="return false;" src="${foto}" alt="Foto ${index + 1}" onload="window.updatePhotoProgress && window.updatePhotoProgress()">
                 </div>
             `;
         });
 
         $('#galeria').html(galeriaHtml);
-        $('#totalFotos').text(fotos.length);
+        
+        // Actualizar el contador del carrusel modal
+        $('#totalFotos').text(totalPhotos);
+
+        // Se ejecuta cuando cada foto carga
+        window.updatePhotoProgress = function() {
+            photosLoaded++;
+            updateLoadingProgress();
+            
+            // Si todas las fotos cargaron, ocultar pantalla de carga
+            if (photosLoaded >= totalPhotos) {
+                hideLoadingScreen();
+            }
+        };
+
+        // Si no hay fotos, ocultar pantalla de carga
+        if (totalPhotos === 0) {
+            hideLoadingScreen();
+        }
 
         // Evento click en las fotos para abrir el modal
         $('.item').on('click', function() {
@@ -85,6 +138,7 @@ $(document).ready(function() {
     }).fail(function() {
         console.error('Error cargando las fotos');
         $('#galeria').html('<p style="color: red;">Error al cargar las fotos</p>');
+        hideLoadingScreen();
     });
 
     // Cerrar modal carrusel
